@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
@@ -38,8 +39,20 @@ class TopicGachaViewModel(
             initialValue = emptyList(),
         )
 
-    val isCurrentTopicFavorite: StateFlow<Boolean> = combine(_currentTopic, favorites) { topic, favList ->
-        topic != null && favList.any { it.id == topic.id }
+    val isFavoritesLoaded: StateFlow<Boolean> = favoritesRepository.favorites
+        .map { true }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = false,
+        )
+
+    val isCurrentTopicFavorite: StateFlow<Boolean> = combine(
+        _currentTopic,
+        favorites,
+        isFavoritesLoaded,
+    ) { topic, favList, loaded ->
+        loaded && topic != null && favList.any { it.id == topic.id }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
@@ -54,7 +67,10 @@ class TopicGachaViewModel(
     }
 
     fun drawTopic(): Boolean {
-        val topic = topicRepository.getRandomTopic(_selectedCategory.value)
+        val topic = topicRepository.getRandomTopic(
+            category = _selectedCategory.value,
+            excludeId = _currentTopic.value?.id,
+        )
         updateCurrentTopic(topic)
         return topic != null
     }
@@ -70,6 +86,7 @@ class TopicGachaViewModel(
 
     fun toggleFavorite() {
         val topic = _currentTopic.value ?: return
+        if (!isFavoritesLoaded.value) return
         if (!favoriteToggleInProgress.compareAndSet(false, true)) return
 
         viewModelScope.launch {

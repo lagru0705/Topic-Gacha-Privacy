@@ -6,7 +6,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -64,14 +67,18 @@ fun TopicScreen(
             Spacer(modifier = Modifier.weight(1f))
 
             Surface(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 360.dp),
                 shape = MaterialTheme.shapes.extraLarge,
                 color = MaterialTheme.colorScheme.primaryContainer,
                 tonalElevation = 2.dp,
             ) {
                 Text(
                     text = topicText,
-                    modifier = Modifier.padding(32.dp),
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(32.dp),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Medium,
                     textAlign = TextAlign.Center,

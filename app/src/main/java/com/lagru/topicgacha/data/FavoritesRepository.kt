@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.lagru.topicgacha.model.Topic
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
 private val Context.favoritesDataStore: DataStore<Preferences> by preferencesDataStore(
@@ -22,33 +23,41 @@ class FavoritesRepository(
     private val favoritesOrderKey = stringPreferencesKey("favorite_topic_ids_ordered")
     private val legacyFavoritesKey = stringSetPreferencesKey("favorite_topic_ids")
 
-    val favorites: Flow<List<Topic>> = context.favoritesDataStore.data.map { preferences ->
-        val orderedIds = parseOrderedIds(preferences[favoritesOrderKey])
-        val ids = orderedIds.ifEmpty {
-            preferences[legacyFavoritesKey].orEmpty().toList()
-        }
-        topicRepository.getTopicsByIds(ids)
-    }
-
-    suspend fun addFavorite(topicId: String) {
-        context.favoritesDataStore.edit { preferences ->
-            val current = parseOrderedIds(preferences[favoritesOrderKey]).ifEmpty {
+    val favorites: Flow<List<Topic>> = context.favoritesDataStore.data
+        .map { preferences ->
+            val orderedIds = parseOrderedIds(preferences[favoritesOrderKey])
+            val ids = orderedIds.ifEmpty {
                 preferences[legacyFavoritesKey].orEmpty().toList()
             }
-            if (topicId in current) return@edit
+            topicRepository.getTopicsByIds(ids)
+        }
+        .catch {
+            emit(emptyList())
+        }
 
-            preferences[favoritesOrderKey] = encodeOrderedIds(current + topicId)
-            preferences.remove(legacyFavoritesKey)
+    suspend fun addFavorite(topicId: String) {
+        runCatching {
+            context.favoritesDataStore.edit { preferences ->
+                val current = parseOrderedIds(preferences[favoritesOrderKey]).ifEmpty {
+                    preferences[legacyFavoritesKey].orEmpty().toList()
+                }
+                if (topicId in current) return@edit
+
+                preferences[favoritesOrderKey] = encodeOrderedIds(current + topicId)
+                preferences.remove(legacyFavoritesKey)
+            }
         }
     }
 
     suspend fun removeFavorite(topicId: String) {
-        context.favoritesDataStore.edit { preferences ->
-            val current = parseOrderedIds(preferences[favoritesOrderKey]).ifEmpty {
-                preferences[legacyFavoritesKey].orEmpty().toList()
+        runCatching {
+            context.favoritesDataStore.edit { preferences ->
+                val current = parseOrderedIds(preferences[favoritesOrderKey]).ifEmpty {
+                    preferences[legacyFavoritesKey].orEmpty().toList()
+                }
+                preferences[favoritesOrderKey] = encodeOrderedIds(current.filter { it != topicId })
+                preferences.remove(legacyFavoritesKey)
             }
-            preferences[favoritesOrderKey] = encodeOrderedIds(current.filter { it != topicId })
-            preferences.remove(legacyFavoritesKey)
         }
     }
 

@@ -25,6 +25,7 @@ fun TopicGachaNavHost(
     val selectedCategory by viewModel.selectedCategory.collectAsState()
     val currentTopic by viewModel.currentTopic.collectAsState()
     val favorites by viewModel.favorites.collectAsState()
+    val isFavoritesLoaded by viewModel.isFavoritesLoaded.collectAsState()
     val isCurrentTopicFavorite by viewModel.isCurrentTopicFavorite.collectAsState()
     var isDrawingTopic by remember { mutableStateOf(false) }
 
@@ -82,6 +83,7 @@ fun TopicGachaNavHost(
         composable(Routes.FAVORITES) {
             FavoriteScreen(
                 favorites = favorites,
+                isLoading = !isFavoritesLoaded,
                 onRemoveFavorite = viewModel::removeFavorite,
                 onNavigateBack = { navController.popBackStack() },
             )
