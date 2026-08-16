@@ -35,7 +35,7 @@ class FavoritesRepository(
             emit(emptyList())
         }
 
-    suspend fun addFavorite(topicId: String) {
+    suspend fun addFavorite(topicId: String): Boolean =
         runCatching {
             context.favoritesDataStore.edit { preferences ->
                 val current = parseOrderedIds(preferences[favoritesOrderKey]).ifEmpty {
@@ -46,10 +46,9 @@ class FavoritesRepository(
                 preferences[favoritesOrderKey] = encodeOrderedIds(current + topicId)
                 preferences.remove(legacyFavoritesKey)
             }
-        }
-    }
+        }.isSuccess
 
-    suspend fun removeFavorite(topicId: String) {
+    suspend fun removeFavorite(topicId: String): Boolean =
         runCatching {
             context.favoritesDataStore.edit { preferences ->
                 val current = parseOrderedIds(preferences[favoritesOrderKey]).ifEmpty {
@@ -58,8 +57,7 @@ class FavoritesRepository(
                 preferences[favoritesOrderKey] = encodeOrderedIds(current.filter { it != topicId })
                 preferences.remove(legacyFavoritesKey)
             }
-        }
-    }
+        }.isSuccess
 
     private fun parseOrderedIds(raw: String?): List<String> =
         raw

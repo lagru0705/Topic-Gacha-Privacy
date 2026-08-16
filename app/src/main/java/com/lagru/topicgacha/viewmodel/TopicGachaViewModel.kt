@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import com.lagru.topicgacha.analytics.TopicAnalytics
 import com.lagru.topicgacha.data.FavoritesRepository
 import com.lagru.topicgacha.data.TopicRepository
 import com.lagru.topicgacha.model.Topic
@@ -24,6 +25,7 @@ class TopicGachaViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val topicRepository: TopicRepository,
     private val favoritesRepository: FavoritesRepository,
+    private val topicAnalytics: TopicAnalytics,
 ) : ViewModel() {
 
     private val _selectedCategory = MutableStateFlow(restoreCategory())
@@ -64,24 +66,33 @@ class TopicGachaViewModel(
     fun selectCategory(category: TopicCategory) {
         _selectedCategory.value = category
         savedStateHandle[KEY_SELECTED_CATEGORY] = category.name
+        topicAnalytics.logSelectCategory(category)
     }
 
     fun drawTopic(): Boolean {
+        val category = _selectedCategory.value
         val topic = topicRepository.getRandomTopic(
-            category = _selectedCategory.value,
+            category = category,
             excludeId = _currentTopic.value?.id,
         )
         updateCurrentTopic(topic)
+        if (topic != null) {
+            topicAnalytics.logDrawTopic(category)
+        }
         return topic != null
     }
 
     fun redrawTopic() {
+        val category = _selectedCategory.value
         val current = _currentTopic.value
         val topic = topicRepository.getRandomTopic(
-            category = _selectedCategory.value,
+            category = category,
             excludeId = current?.id,
         )
         updateCurrentTopic(topic)
+        if (topic != null) {
+            topicAnalytics.logDrawTopic(category)
+        }
     }
 
     fun toggleFavorite() {
@@ -93,9 +104,13 @@ class TopicGachaViewModel(
             try {
                 val currentlyFavorite = favorites.value.any { it.id == topic.id }
                 if (currentlyFavorite) {
-                    favoritesRepository.removeFavorite(topic.id)
+                    if (favoritesRepository.removeFavorite(topic.id)) {
+                        topicAnalytics.logUnfavoriteTopic(topic.category)
+                    }
                 } else {
-                    favoritesRepository.addFavorite(topic.id)
+                    if (favoritesRepository.addFavorite(topic.id)) {
+                        topicAnalytics.logFavoriteTopic(topic.category)
+                    }
                 }
             } finally {
                 favoriteToggleInProgress.set(false)
@@ -104,8 +119,11 @@ class TopicGachaViewModel(
     }
 
     fun removeFavorite(topicId: String) {
+        val topic = topicRepository.getTopicById(topicId)
         viewModelScope.launch {
-            favoritesRepository.removeFavorite(topicId)
+            if (favoritesRepository.removeFavorite(topicId)) {
+                topic?.let { topicAnalytics.logUnfavoriteTopic(it.category) }
+            }
         }
     }
 
@@ -137,6 +155,7 @@ class TopicGachaViewModel(
 class TopicGachaViewModelFactory(
     private val topicRepository: TopicRepository,
     private val favoritesRepository: FavoritesRepository,
+    private val topicAnalytics: TopicAnalytics,
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
@@ -145,6 +164,7 @@ class TopicGachaViewModelFactory(
                 savedStateHandle = extras.createSavedStateHandle(),
                 topicRepository = topicRepository,
                 favoritesRepository = favoritesRepository,
+                topicAnalytics = topicAnalytics,
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")

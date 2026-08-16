@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.lagru.topicgacha.analytics.TopicAnalytics
 import com.lagru.topicgacha.data.FavoritesRepository
 import com.lagru.topicgacha.data.TopicRepository
 import com.lagru.topicgacha.ui.navigation.TopicGachaNavHost
@@ -21,6 +23,9 @@ class MainActivity : ComponentActivity() {
     private val favoritesRepository by lazy {
         FavoritesRepository(applicationContext, topicRepository)
     }
+    private val topicAnalytics by lazy {
+        TopicAnalytics(FirebaseAnalytics.getInstance(applicationContext))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +37,7 @@ class MainActivity : ComponentActivity() {
                         factory = TopicGachaViewModelFactory(
                             topicRepository = topicRepository,
                             favoritesRepository = favoritesRepository,
+                            topicAnalytics = topicAnalytics,
                         ),
                     )
                     TopicGachaNavHost(viewModel = viewModel)
