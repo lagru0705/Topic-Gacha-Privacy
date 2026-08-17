@@ -8,6 +8,12 @@
 .cxx
 local.properties
 
+# Release signing — never commit secrets or the keystore
+keystore.properties
+*.jks
+*.keystore
+/keystore/
+
 # Android Studio / IntelliJ — keep only shared project markers tracked
 .idea/*
 !.idea/.gitignore

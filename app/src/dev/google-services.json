@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "463895899372",
+    "project_id": "topic-gacha",
+    "storage_bucket": "topic-gacha.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:463895899372:android:009847f805b443c7b689c9",
+        "android_client_info": {
+          "package_name": "com.lagru.topicgacha.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2keFCv4hd1Ci6wOZWto4oAoc4oa4YR_Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

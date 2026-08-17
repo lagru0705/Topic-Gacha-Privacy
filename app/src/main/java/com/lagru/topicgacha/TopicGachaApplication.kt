@@ -8,12 +8,14 @@ class TopicGachaApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Avoid polluting production Analytics with debug sessions.
+        // prdRelease only — keep dev/debug sessions out of production Analytics.
         FirebaseAnalytics.getInstance(this)
-            .setAnalyticsCollectionEnabled(!BuildConfig.DEBUG)
+            .setAnalyticsCollectionEnabled(isProductionAnalyticsEnabled())
 
-        // Crash reports are useful in both debug and release.
         FirebaseCrashlytics.getInstance()
             .isCrashlyticsCollectionEnabled = true
     }
+
+    private fun isProductionAnalyticsEnabled(): Boolean =
+        BuildConfig.ENVIRONMENT == "prd" && !BuildConfig.DEBUG
 }
