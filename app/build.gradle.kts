@@ -19,12 +19,14 @@ android {
     compileSdk {
         version = release(37)
     }
+    // AGP 9.3 default; required to extract native debug symbols for Play Console.
+    ndkVersion = "28.2.13676358"
 
     defaultConfig {
         applicationId = "com.lagru.topicgacha"
         minSdk = 31
         targetSdk = 37
-        versionCode = 2
+        versionCode = 4
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -59,7 +61,10 @@ android {
     buildTypes {
         release {
             optimization {
-                enable = false
+                enable = true
+            }
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
             }
             if (keystorePropertiesFile.exists()) {
                 signingConfig = signingConfigs.getByName("release")
