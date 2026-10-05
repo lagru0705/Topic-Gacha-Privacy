@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>プライバシーポリシー | 話題ガチャ</title>
+    <title>プライバシーポリシー | Topic Gacha</title>
+
+    <link rel="alternate" hreflang="ja" href="https://lagru0705.github.io/Topic-Gacha-Privacy/">
+    <link rel="alternate" hreflang="en" href="https://lagru0705.github.io/Topic-Gacha-Privacy/en/">
+    <link rel="alternate" hreflang="x-default" href="https://lagru0705.github.io/Topic-Gacha-Privacy/">
 
     <style>
         :root {
@@ -61,6 +65,20 @@
             word-break: break-all;
         }
 
+        .lang-switch {
+            margin: 0 0 24px;
+            font-size: 0.95rem;
+        }
+
+        .lang-switch [aria-current="page"] {
+            font-weight: 700;
+        }
+
+        .lang-switch .sep {
+            margin: 0 0.45em;
+            color: #888;
+        }
+
         .updated {
             color: #666;
             font-size: 0.9rem;
@@ -93,12 +111,18 @@
 
 <main>
 
+    <nav class="lang-switch" aria-label="言語">
+        <span lang="ja" aria-current="page">日本語</span>
+        <span class="sep" aria-hidden="true">|</span>
+        <a lang="en" href="en/">English</a>
+    </nav>
+
     <h1>プライバシーポリシー</h1>
 
-    <p class="updated">最終更新日：2026年8月20日</p>
+    <p class="updated">最終更新日：2026年10月5日</p>
 
     <p>
-        「話題ガチャ - 飲み会・初対面の会話ネタ」（以下、「本アプリ」）は、
+        「Topic Gacha」（以下、「本アプリ」）は、
         ユーザーのプライバシーを尊重し、情報を適切に取り扱います。
     </p>
 
@@ -135,13 +159,25 @@
     </ul>
 
     <p>
-        これらのイベントでは、カテゴリ、レア度、会話セッションの種類、
-        完了した話題数などの情報を利用する場合があります。
+        これらのイベントでは、カテゴリ、レア度、セッション種別、
+        フィードバック内容、完了した話題数、
+        話題ID（topic_id）などの情報を利用する場合があります。
+        カテゴリは、画面の表示言語に依存しない区分として記録します。
     </p>
 
     <p>
-        本アプリは、話題の本文そのものや、
-        話題を特定するためのIDを分析データとして送信しません。
+        本アプリでは、話題の本文そのものを分析データとして送信しません。
+    </p>
+
+    <p>
+        一部の利用状況分析では、どの話題に対する操作であるかを把握するため、
+        アプリ内で定義された話題ID（topic_id）を送信する場合があります。
+    </p>
+
+    <p>
+        この話題IDはアプリ内の話題を識別するための固定IDであり、
+        氏名、メールアドレスなど、ユーザーを直接識別する情報は含まれていません。
+        ユーザーが入力した文章を、話題IDとして送信することもありません。
     </p>
 
     <p>
@@ -296,7 +332,10 @@
         ただし、会話セッション機能の利用状況を把握するため、
         「盛り上がった」などの操作が行われたこと自体を
         Firebase Analyticsのイベントとして記録する場合があります。
-        この際、話題の本文や話題を特定するIDは送信しません。
+        この際、話題の本文そのものは送信しません。
+        どの話題に対する操作であるかを把握するため、
+        アプリ内で定義された話題ID（topic_id）を送信する場合があります。
+        この話題IDは、ユーザーを直接識別する情報を含みません。
     </p>
 
     <p>
@@ -390,7 +429,7 @@
     </p>
 
     <p>
-        アプリ名：話題ガチャ - 飲み会・初対面の会話ネタ<br>
+        アプリ名：Topic Gacha<br>
         開発者：Lagru
     </p>
 
